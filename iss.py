@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import IPython
-import scipy
+import math
+from numpy.core.numeric import isclose
 from scipy.signal import spectrogram, lfilter, freqz, tf2zpk, find_peaks
 from scipy.io import wavfile
 plt.style.use('seaborn-whitegrid')
@@ -15,7 +16,7 @@ def dft(array):
         for j in range(len(array)):
             coef += array[j] * np.exp(-2j * np.pi * i * j * (1 / len(array)))
         # ---------------------------------------------------------------zapisujem abs
-        arr.append(abs(coef))
+        arr.append(coef)
     return arr
     # N = len(array)
     # n = np.arange(N)
@@ -86,6 +87,15 @@ plt.xlabel("f(Hz)")
 ###########################################################
 
 ###########################################################
+# Kontrola DFT
+correctDFT = np.fft.fft(array[index])
+if np.allclose(after_dft, correctDFT):
+    print("DFTs match")
+else:
+    print("Something is wrong")
+###########################################################
+
+###########################################################
 # Spektogram
 after_log = 10 * np.log10(np.abs(after_dft)**2)
 plt.figure(5)
@@ -120,6 +130,21 @@ peaks = [np.floor(float(x)) for x in peaks]
 print("Rusive frekvencie : ", peaks)
 ###########################################################
 
+
+###########################################################
+# Kontrola zistenych rusivych frekvencii
+peak = peaks[0]
+before_peak = peaks[0]
+diff = 15
+for i in peaks:
+    if math.isclose(peak, i, abs_tol=diff):
+        print("Peak ", i, "is OK")
+    else:
+        print("Peak ", i, "is NOT OK")
+    peak += before_peak
+    diff += 15
+print("Rusive frekvencie : ", peaks)
+###########################################################
 
 # F = 600
 # T = 1/F
